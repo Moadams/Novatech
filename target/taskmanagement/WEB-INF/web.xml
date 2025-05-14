@@ -17,6 +17,16 @@
         <url-pattern>/login</url-pattern>
     </servlet-mapping>
 
+    <!-- Task Servlet -->
+    <servlet>
+        <servlet-name>TaskListServlet</servlet-name>
+        <servlet-class>com.novatech.controller.task.TaskListServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>TaskListServlet</servlet-name>
+        <url-pattern>/tasks</url-pattern>
+    </servlet-mapping>
+
     
 
     <!-- Welcome Page -->
