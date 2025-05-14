@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConfig {
-    private static String url = "jdbc:postresql://localhost:5432/Novatech";
+    private static String url = "jdbc:postgresql://localhost:5432/Novatech";
     private static String user = "postgres";
     private static String password = "5llsmu1";
     private static Connection connection;
