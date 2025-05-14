@@ -7,30 +7,34 @@ import java.sql.SQLException;
 
 import com.novatech.model.User;
 import com.novatech.util.DatabaseConfig;
+import com.novatech.util.LoggerUtil;
 
 public class UserDAO {
+    private LoggerUtil logger = new LoggerUtil();
     public boolean addUser(User user) {
-        String query = "INSERT INTO User (username, password, email, created_at) VALUES (?,?,?,?)";
+        String query = "INSERT INTO users (id, username, password, email, created_at) VALUES (?,?,?,?,?)";
         try (Connection connection = DatabaseConfig.getConnection();
         PreparedStatement statement = connection.prepareStatement(query)) {
             
-            statement.setString(1, user.getUsername());
-            statement.setString(2, user.getPassword());
-            statement.setString(3, user.getEmail());
-            statement.setTimestamp(4,user.getCreatedAt());
+            
+            statement.setInt(1,user.getUserId());
+            statement.setString(2, user.getUsername());
+            statement.setString(3, user.getPassword());
+            statement.setString(4, user.getEmail());
+            statement.setTimestamp(5,user.getCreatedAt());
 
             int rowsAffected = statement.executeUpdate();
             return rowsAffected > 0;
 
         } catch (Exception e) {
+            logger.logError("Error creating user " + e.getMessage(), e);
             System.err.println("Error creating user: " + e.getMessage());
-            e.printStackTrace();
             return false;
         }
     }
 
     public User getUserByUsername(String username) {
-        String query = "SELECT * FROM User WHERE username = ?";
+        String query = "SELECT * FROM users WHERE username = ?";
         try (Connection connection = DatabaseConfig.getConnection();
         PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, username);
@@ -54,7 +58,7 @@ public class UserDAO {
     }
 
     public User getUserByEmail(String email){
-        String query = "SELECT * FROM User WHERE email = ?";
+        String query = "SELECT * FROM users WHERE email = ?";
         try (Connection connection = DatabaseConfig.getConnection();
         PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, email);
@@ -78,7 +82,7 @@ public class UserDAO {
     }
 
     public User getUserById(int userId){
-        String query = "SELECT * FROM User WHERE id = ?";
+        String query = "SELECT * FROM users WHERE id = ?";
         try (Connection connection = DatabaseConfig.getConnection();
         PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, userId);
@@ -102,7 +106,7 @@ public class UserDAO {
     }
 
     public boolean updateUser(User user) {
-        String query = "UPDATE User SET username = ?, email = ?, WHERE id = ?";
+        String query = "UPDATE users SET username = ?, email = ?, WHERE id = ?";
         try (Connection connection = DatabaseConfig.getConnection();
         PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, user.getUsername());
@@ -119,7 +123,7 @@ public class UserDAO {
     }
 
     public boolean updateUserPassword(int userId, String newPassword) {
-        String query = "UPDATE User SET password = ? WHERE id = ?";
+        String query = "UPDATE users SET password = ? WHERE id = ?";
         try (Connection connection = DatabaseConfig.getConnection();
         PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, newPassword);
@@ -135,7 +139,7 @@ public class UserDAO {
     }
 
     public boolean deleteUser(int userId) {
-        String query = "DELETE FROM User WHERE id = ?";
+        String query = "DELETE FROM users WHERE id = ?";
         try (Connection connection = DatabaseConfig.getConnection();
         PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, userId);
@@ -171,6 +175,20 @@ public class UserDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public boolean userExists(String username) {
+        String sql = "SELECT id FROM users WHERE username = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 }
