@@ -8,7 +8,6 @@ import javax.servlet.http.*;
 import com.novatech.dao.UserDAO;
 import com.novatech.model.User;
 import com.novatech.util.DatabaseConfig;
-import com.novatech.util.PasswordUtil;
 import com.novatech.util.ValidationUtil;
 
 import javax.servlet.annotation.*;
@@ -58,10 +57,8 @@ public class SignupServlet extends HttpServlet {
             return;
         }
 
-        String passwordSalt = PasswordUtil.generateSalt();
-        String hashedPassword = PasswordUtil.hashPassword(password, passwordSalt);
 
-        User user = new User(userId, username, hashedPassword, email);
+        User user = new User(userId, username, password, email);
 
         boolean success = userDAO.addUser(user);
 
