@@ -37,7 +37,7 @@ public class LoginServlet extends HttpServlet {
             HttpSession session = request.getSession();
             session.setAttribute("userId", user.getUserId());
             session.setAttribute("username", user.getUsername());
-            response.sendRedirect("tasks");
+            response.sendRedirect("/taskmanagement/tasks");
         } else {
             request.setAttribute("error", "Invalid credentials");
             request.getRequestDispatcher("views/auth/login.jsp").forward(request, response);
