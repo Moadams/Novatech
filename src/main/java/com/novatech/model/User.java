@@ -9,12 +9,12 @@ public class User {
     private String email;
     private Timestamp createdAt;
 
-    public User(int userId, String username, String password, String email, Timestamp createdAt) {
+    public User(int userId, String username, String password, String email) {
         this.userId = userId;
         this.username = username;
         this.password = password;
         this.email = email;
-        this.createdAt = createdAt;
+        this.createdAt = new Timestamp(System.currentTimeMillis());
     }
 
     public User() {
