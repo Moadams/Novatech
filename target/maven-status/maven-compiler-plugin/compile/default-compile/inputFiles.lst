@@ -2,7 +2,9 @@ C:\Users\moadams\Documents\Amalitech\week7\taskmanagement\src\main\java\com\nova
 C:\Users\moadams\Documents\Amalitech\week7\taskmanagement\src\main\java\com\novatech\util\DatabaseConfig.java
 C:\Users\moadams\Documents\Amalitech\week7\taskmanagement\src\main\java\com\novatech\util\ValidationUtil.java
 C:\Users\moadams\Documents\Amalitech\week7\taskmanagement\src\main\java\com\novatech\model\Category.java
+C:\Users\moadams\Documents\Amalitech\week7\taskmanagement\src\main\java\com\novatech\controller\auth\SignupServlet.java
 C:\Users\moadams\Documents\Amalitech\week7\taskmanagement\src\main\java\com\novatech\util\PasswordUtil.java
 C:\Users\moadams\Documents\Amalitech\week7\taskmanagement\src\main\java\com\novatech\dao\UserDAO.java
 C:\Users\moadams\Documents\Amalitech\week7\taskmanagement\src\main\java\com\novatech\model\User.java
 C:\Users\moadams\Documents\Amalitech\week7\taskmanagement\src\main\java\com\novatech\model\Task.java
+C:\Users\moadams\Documents\Amalitech\week7\taskmanagement\src\main\java\com\novatech\util\LoggerUtil.java

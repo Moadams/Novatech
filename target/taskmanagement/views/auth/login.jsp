@@ -14,7 +14,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-600">
     <div class="glass-effect p-8 rounded-lg shadow-lg w-full max-w-md border border-white border-opacity-20">
         <div class="text-center mb-8">
             <h1 class="text-3xl font-bold text-gray-800">Novatech</h1>
