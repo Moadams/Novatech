@@ -39,10 +39,34 @@ public class TaskDAO {
         task.setUserId(rs.getInt("user_id"));
         task.setTitle(rs.getString("title"));
         task.setDescription(rs.getString("description"));
-        task.setStatus(Task.TaskStatus.valueOf(rs.getString("status")));
+        task.setStatus(rs.getString("status"));
         task.setDueDate(rs.getDate("due_date"));
         task.setCreatedAt(rs.getTimestamp("created_at"));
         task.setUpdatedAt(rs.getTimestamp("updated_at"));
         return task;
+    }
+
+    public boolean createTask(Task task) {
+        String sql = "INSERT INTO tasks (id, user_id, title, description, status, priority, due_date, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection connection = DatabaseConfig.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, task.getTaskId());
+            statement.setInt(2, task.getUserId());
+            statement.setString(3, task.getTitle());
+            statement.setString(4, task.getDescription());
+            statement.setString(5, task.getStatus());
+            statement.setString(6, task.getPriority());
+            statement.setDate(7, task.getDueDate());
+            statement.setTimestamp(8, task.getCreatedAt());
+            statement.setTimestamp(9, task.getUpdatedAt());
+
+            System.out.println("created at: " + task.getCreatedAt());
+            System.out.println("updated at" + task.getUpdatedAt());
+            int rowsAffected = statement.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            logger.logError("Error creating task: " + e.getMessage(), e);
+            e.printStackTrace();
+            return false;
+        }
     }
 }
