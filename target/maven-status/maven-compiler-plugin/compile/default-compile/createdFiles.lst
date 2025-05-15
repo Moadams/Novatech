@@ -3,9 +3,8 @@ com\novatech\dao\TaskDAO.class
 com\novatech\util\LoggerUtil.class
 com\novatech\dao\UserDAO.class
 com\novatech\model\User.class
+com\novatech\controller\task\DeleteTaskServlet.class
 com\novatech\controller\auth\SignupServlet.class
-com\novatech\model\Task$PriorityLevel.class
-com\novatech\model\Task$TaskStatus.class
 com\novatech\util\DatabaseConfig.class
 com\novatech\controller\auth\LoginServlet.class
 com\novatech\controller\task\CreateTaskServlet.class
