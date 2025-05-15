@@ -8,6 +8,7 @@ com\novatech\model\Task$PriorityLevel.class
 com\novatech\model\Task$TaskStatus.class
 com\novatech\util\DatabaseConfig.class
 com\novatech\controller\auth\LoginServlet.class
+com\novatech\controller\task\CreateTaskServlet.class
 com\novatech\model\Task.class
 com\novatech\controller\task\TaskListServlet.class
 com\novatech\util\PasswordUtil.class
