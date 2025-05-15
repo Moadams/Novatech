@@ -8,23 +8,16 @@ public class Task {
     private int userId;
     private String title;
     private String description;
-    private TaskStatus status;
-    private PriorityLevel priority;
+    private String status;
+    private String priority;
     private Date dueDate;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
-    public enum TaskStatus{
-        PENDING, IN_PROGRESS, COMPLETED
-    }
-
-    public enum PriorityLevel{
-        LOW, MEDIUM, HIGH
-    }
 
     public Task(){}
 
-    public Task(int taskId, int userId, String title, String description, TaskStatus status, PriorityLevel priority, Date dueDate, Timestamp createdAt, Timestamp updatedAt) {
+    public Task(int taskId, int userId, String title, String description, String status, String priority, Date dueDate) {
         this.taskId = taskId;
         this.userId = userId;
         this.title = title;
@@ -32,8 +25,8 @@ public class Task {
         this.status = status;
         this.priority = priority;
         this.dueDate = dueDate;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.createdAt = new Timestamp(System.currentTimeMillis());
+        this.updatedAt = new Timestamp(System.currentTimeMillis());
     }
 
     public int getTaskId() {
@@ -68,19 +61,19 @@ public class Task {
         this.description = description;
     }
 
-    public TaskStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(TaskStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
-    public PriorityLevel getPriority() {
+    public String getPriority() {
         return priority;
     }
 
-    public void setPriority(PriorityLevel priority) {
+    public void setPriority(String priority) {
         this.priority = priority;
     }
 
