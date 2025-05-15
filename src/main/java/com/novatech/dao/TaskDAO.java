@@ -59,13 +59,26 @@ public class TaskDAO {
             statement.setTimestamp(8, task.getCreatedAt());
             statement.setTimestamp(9, task.getUpdatedAt());
 
-            System.out.println("created at: " + task.getCreatedAt());
-            System.out.println("updated at" + task.getUpdatedAt());
+           
             int rowsAffected = statement.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {
             logger.logError("Error creating task: " + e.getMessage(), e);
             e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    public boolean deleteTask(int taskId) {
+        String query = "DELETE FROM tasks WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, taskId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error deleting task: " + e.getMessage());
             return false;
         }
     }
