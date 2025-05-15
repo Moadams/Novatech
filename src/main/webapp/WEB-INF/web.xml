@@ -27,6 +27,16 @@
         <url-pattern>/tasks</url-pattern>
     </servlet-mapping>
 
+    <!-- Create Task Servlet -->
+    <servlet>
+        <servlet-name>CreateTaskServlet</servlet-name>
+        <servlet-class>com.novatech.controller.task.CreateTaskServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CreateTaskServlet</servlet-name>
+        <url-pattern>/create-task</url-pattern>
+    </servlet-mapping>
+
     
 
     <!-- Welcome Page -->
