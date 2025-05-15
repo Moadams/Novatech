@@ -1,3 +1,4 @@
+
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Date" %>
@@ -68,6 +69,9 @@
         .status-pending { background-color: #FEF3C7; color: #92400E; }
         .status-in-progress { background-color: #DBEAFE; color: #1E40AF; }
         .status-completed { background-color: #D1FAE5; color: #065F46; }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -101,9 +105,9 @@
             </a>
         </div>
 
-        <!-- Empty State -->
+        <!-- Initial Empty State (only shown when there are truly no tasks) -->
         <% if (!hasTasks) { %>
-        <div class="bg-white rounded-lg shadow p-6 text-center">
+        <div id="empty-state" class="bg-white rounded-lg shadow p-6 text-center">
             <img src="/api/placeholder/200/150" alt="No tasks" class="mx-auto mb-4">
             <h2 class="text-xl font-medium text-gray-900 mb-2">No tasks yet</h2>
             <p class="text-gray-500 mb-6">Create your first task to start being productive</p>
@@ -114,62 +118,73 @@
                 Create Task
             </a>
         </div>
-        <% } %>
+        <% } else { %>
         
         <!-- Task Filters -->
         <div class="bg-white rounded-lg shadow mb-6">
             <div class="px-4 py-5 sm:p-6">
-                <div class="flex flex-wrap gap-4">
-                    <button class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full bg-indigo-100 text-indigo-800">
+                <div class="flex flex-wrap gap-4" id="status-filters">
+                    <button class="filter-btn active inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full bg-indigo-100 text-indigo-800" data-status="ALL">
                         All Tasks
                     </button>
-                    <button class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50">
+                    <button class="filter-btn inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50" data-status="IN_PROGRESS">
                         In Progress
                     </button>
-                    <button class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50">
+                    <button class="filter-btn inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50" data-status="COMPLETED">
                         Completed
                     </button>
-                    <button class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50">
+                    <button class="filter-btn inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50" data-status="PENDING">
                         Pending
                     </button>
                 </div>
             </div>
         </div>
-        
-        <!-- Task Cards -->
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <% if (hasTasks) { %>
-                <% for (Task task : tasks) { %>
-                    <div class="task-card bg-white overflow-hidden shadow rounded-lg">
-                        <div class="px-4 py-5 sm:p-6">
-                            <div class="flex justify-between items-start">
-                                <h3 class="text-lg font-medium text-gray-900 mb-2"><%= task.getTitle() %></h3>
-                                <div class="flex space-x-2">
-                                    <a href="edit-task.jsp?id=<%= task.getTaskId() %>" class="text-gray-400 hover:text-gray-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                                        </svg>
-                                    </a>
-                                    <a href="delete-task?id=<%= task.getTaskId() %>" class="text-gray-400 hover:text-red-500" onclick="return confirm('Are you sure you want to delete this task?')">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-                            <p class="mt-1 text-sm text-gray-600 line-clamp-3"><%= task.getDescription() %></p>
-                            <div class="mt-4 flex justify-between items-center">
-                                <span class="status-badge <%= task.getStatus().equals("COMPLETED") ? "status-completed" : task.getStatus().equals("IN_PROGRESS") ? "status-in-progress" : "status-pending" %>">
-                                    <%= task.getStatus() %>
-                                </span>
-                                <span class="text-xs text-gray-500"><%= getTimeAgo(task.getCreatedAt()) %></span>
-                            </div>
-                        </div>
-                    </div>
-                <% } %>
-            <% } %>
+
+        <!-- Filtered Empty State (shown when filter has no results) -->
+        <div id="filtered-empty-state" class="hidden bg-white rounded-lg shadow p-6 text-center">
+            <img src="/api/placeholder/200/150" alt="No matching tasks" class="mx-auto mb-4">
+            <h2 class="text-xl font-medium text-gray-900 mb-2">No matching tasks</h2>
+            <p class="text-gray-500 mb-6">There are no tasks matching the current filter</p>
+            <a href="create-task" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                Create Task
+            </a>
         </div>
         
+        <!-- Task Cards -->
+        <div id="task-grid" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <% for (Task task : tasks) { %>
+                <div class="task-card bg-white overflow-hidden shadow rounded-lg" data-status="<%= task.getStatus() %>">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-medium text-gray-900 mb-2"><%= task.getTitle() %></h3>
+                            <div class="flex space-x-2">
+                                <a href="edit-task.jsp?id=<%= task.getTaskId() %>" class="text-gray-400 hover:text-gray-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                    </svg>
+                                </a>
+                                <a href="delete-task?id=<%= task.getTaskId() %>" class="text-gray-400 hover:text-red-500" onclick="return confirm('Are you sure you want to delete this task?')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                        <p class="mt-1 text-sm text-gray-600 line-clamp-3"><%= task.getDescription() %></p>
+                        <div class="mt-4 flex justify-between items-center">
+                            <span class="status-badge <%= task.getStatus().equals("COMPLETED") ? "status-completed" : task.getStatus().equals("IN_PROGRESS") ? "status-in-progress" : "status-pending" %>">
+                                <%= task.getStatus() %>
+                            </span>
+                            <span class="text-xs text-gray-500"><%= getTimeAgo(task.getCreatedAt()) %></span>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+        <% } %>
     </main>
 
     <!-- Footer -->
@@ -180,5 +195,60 @@
             </p>
         </div>
     </footer>
+
+    <!-- JavaScript for Filtering Tasks -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const taskCards = document.querySelectorAll('.task-card');
+            const taskGrid = document.getElementById('task-grid');
+            const filteredEmptyState = document.getElementById('filtered-empty-state');
+            
+            // Function to apply filter
+            function applyFilter(status) {
+                let visibleCount = 0;
+                
+                taskCards.forEach(card => {
+                    if (status === 'ALL' || card.dataset.status === status) {
+                        card.classList.remove('hidden');
+                        visibleCount++;
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+                
+                // Show/hide empty state based on filter results
+                if (visibleCount === 0) {
+                    taskGrid.classList.add('hidden');
+                    filteredEmptyState.classList.remove('hidden');
+                } else {
+                    taskGrid.classList.remove('hidden');
+                    filteredEmptyState.classList.add('hidden');
+                }
+                
+                // Update active filter button styles
+                filterButtons.forEach(btn => {
+                    if (btn.dataset.status === status) {
+                        btn.classList.add('bg-indigo-100', 'text-indigo-800');
+                        btn.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
+                    } else {
+                        btn.classList.remove('bg-indigo-100', 'text-indigo-800');
+                        btn.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
+                    }
+                });
+            }
+            
+            // Add click event listeners to filter buttons
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const status = this.dataset.status;
+                    applyFilter(status);
+                });
+            });
+            
+            // Initialize with "All Tasks" filter
+            applyFilter('ALL');
+        });
+    </script>
 </body>
 </html>
