@@ -37,6 +37,16 @@
         <url-pattern>/create-task</url-pattern>
     </servlet-mapping>
 
+    <!-- Delete Task Servlet -->
+    <servlet>
+        <servlet-name>DeleteTaskServlet</servlet-name>
+        <servlet-class>com.novatech.controller.task.DeleteTaskServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DeleteTaskServlet</servlet-name>
+        <url-pattern>/delete-task</url-pattern>
+    </servlet-mapping>
+
     
 
     <!-- Welcome Page -->
