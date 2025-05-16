@@ -119,7 +119,7 @@
                     <span class="text-2xl font-bold text-indigo-600">Novatech</span>
                 </div>
                 <div class="flex items-center">
-                    <a href="create-task.jsp" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <a href="logout" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         Logout
                     </a>
                     
@@ -188,6 +188,24 @@
                             Low Priority
                         </button>
                     </div>
+
+                    <div class="border-l border-gray-200 h-8 mx-2"></div>
+
+                    <div id="sort-controls" class="flex flex-wrap gap-2">
+                        <span class="text-xs font-medium text-gray-700 flex items-center mr-2">Sort by:</span>
+                        <button id="sort-due-date-asc" class="sort-btn inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50" data-sort="dueDate" data-direction="asc">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Due Date (Earliest)
+                        </button>
+                        <button id="sort-due-date-desc" class="sort-btn inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50" data-sort="dueDate" data-direction="desc">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Due Date (Latest)
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -210,7 +228,8 @@
             <% for (Task task : tasks) { %>
                 <div class="task-card bg-white overflow-hidden shadow rounded-lg" 
                      data-status="<%= task.getStatus() %>"
-                     data-priority="<%= task.getPriority() %>">
+                     data-priority="<%= task.getPriority() %>"
+                     data-due-date="<%= task.getDueDate() != null ? task.getDueDate().getTime() : 9999999999999L %>">
                     <div class="px-4 py-5 sm:p-6">
                         <div class="flex justify-between items-start">
                             <h3 class="text-lg font-medium text-gray-900 mb-2"><%= task.getTitle() %></h3>
@@ -295,6 +314,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const filterButtons = document.querySelectorAll('.filter-btn');
+            const sortButtons = document.querySelectorAll('.sort-btn');
             const taskCards = document.querySelectorAll('.task-card');
             const taskGrid = document.getElementById('task-grid');
             const filteredEmptyState = document.getElementById('filtered-empty-state');
@@ -303,6 +323,12 @@
             let activeFilters = {
                 status: 'ALL',
                 priority: null
+            };
+            
+            // Current sorting
+            let currentSort = {
+                field: null,
+                direction: null
             };
             
             // Function to apply filters
@@ -335,6 +361,28 @@
                 }
             }
             
+            // Function to sort tasks
+            function sortTasks() {
+                if (!currentSort.field) return;
+                
+                const cards = Array.from(taskCards);
+                
+                cards.sort((a, b) => {
+                    if (currentSort.field === 'dueDate') {
+                        const dateA = Number(a.dataset.dueDate);
+                        const dateB = Number(b.dataset.dueDate);
+                        
+                        return currentSort.direction === 'asc' ? dateA - dateB : dateB - dateA;
+                    }
+                    return 0;
+                });
+                
+                // Reorder DOM elements
+                cards.forEach(card => {
+                    taskGrid.appendChild(card);
+                });
+            }
+            
             // Update filter button styles
             function updateFilterButtonStyles() {
                 filterButtons.forEach(btn => {
@@ -342,6 +390,22 @@
                     const filterValue = btn.dataset.value;
                     
                     if (activeFilters[filterType] === filterValue) {
+                        btn.classList.add('bg-indigo-100', 'text-indigo-800');
+                        btn.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
+                    } else {
+                        btn.classList.remove('bg-indigo-100', 'text-indigo-800');
+                        btn.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
+                    }
+                });
+            }
+            
+            // Update sort button styles
+            function updateSortButtonStyles() {
+                document.querySelectorAll('.sort-btn').forEach(btn => {
+                    const sortField = btn.dataset.sort;
+                    const sortDirection = btn.dataset.direction;
+                    
+                    if (currentSort.field === sortField && currentSort.direction === sortDirection) {
                         btn.classList.add('bg-indigo-100', 'text-indigo-800');
                         btn.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
                     } else {
@@ -366,6 +430,26 @@
                     
                     updateFilterButtonStyles();
                     applyFilters();
+                });
+            });
+            
+            // Add click event listeners to sort buttons
+            sortButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const sortField = this.dataset.sort;
+                    const sortDirection = this.dataset.direction;
+                    
+                    // Toggle sort if clicking the same sort button again
+                    if (currentSort.field === sortField && currentSort.direction === sortDirection) {
+                        currentSort.field = null;
+                        currentSort.direction = null;
+                    } else {
+                        currentSort.field = sortField;
+                        currentSort.direction = sortDirection;
+                    }
+                    
+                    updateSortButtonStyles();
+                    sortTasks();
                 });
             });
             
