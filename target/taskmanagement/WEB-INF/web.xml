@@ -27,6 +27,16 @@
         <url-pattern>/tasks</url-pattern>
     </servlet-mapping>
 
+     <!-- Task API Servlet -->
+     <servlet>
+        <servlet-name>TaskApiServlet</servlet-name>
+        <servlet-class>com.novatech.controller.task.TaskApiServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>TaskApiServlet</servlet-name>
+        <url-pattern>/tasks-api/*</url-pattern>
+    </servlet-mapping>
+
     <!-- Create Task Servlet -->
     <servlet>
         <servlet-name>CreateTaskServlet</servlet-name>

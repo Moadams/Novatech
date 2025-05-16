@@ -5,6 +5,7 @@ com\novatech\dao\UserDAO.class
 com\novatech\model\User.class
 com\novatech\controller\task\DeleteTaskServlet.class
 com\novatech\controller\auth\SignupServlet.class
+com\novatech\controller\task\TaskApiServlet.class
 com\novatech\controller\task\UpdateTaskServlet.class
 com\novatech\util\DatabaseConfig.class
 com\novatech\controller\auth\LoginServlet.class
