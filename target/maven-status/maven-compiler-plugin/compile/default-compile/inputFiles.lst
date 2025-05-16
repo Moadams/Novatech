@@ -11,4 +11,6 @@ C:\Users\moadams\Documents\Amalitech\week7\taskmanagement\src\main\java\com\nova
 C:\Users\moadams\Documents\Amalitech\week7\taskmanagement\src\main\java\com\novatech\controller\auth\SignupServlet.java
 C:\Users\moadams\Documents\Amalitech\week7\taskmanagement\src\main\java\com\novatech\dao\UserDAO.java
 C:\Users\moadams\Documents\Amalitech\week7\taskmanagement\src\main\java\com\novatech\model\Task.java
+C:\Users\moadams\Documents\Amalitech\week7\taskmanagement\src\main\java\com\novatech\controller\auth\LogoutServlet.java
 C:\Users\moadams\Documents\Amalitech\week7\taskmanagement\src\main\java\com\novatech\util\LoggerUtil.java
+C:\Users\moadams\Documents\Amalitech\week7\taskmanagement\src\main\java\com\novatech\controller\task\UpdateTaskServlet.java

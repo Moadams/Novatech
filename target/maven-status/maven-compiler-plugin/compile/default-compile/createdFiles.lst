@@ -1,10 +1,12 @@
 com\novatech\model\Category.class
 com\novatech\dao\TaskDAO.class
 com\novatech\util\LoggerUtil.class
+com\novatech\controller\auth\LogoutServlet.class
 com\novatech\dao\UserDAO.class
 com\novatech\model\User.class
 com\novatech\controller\task\DeleteTaskServlet.class
 com\novatech\controller\auth\SignupServlet.class
+com\novatech\controller\task\UpdateTaskServlet.class
 com\novatech\util\DatabaseConfig.class
 com\novatech\controller\auth\LoginServlet.class
 com\novatech\controller\task\CreateTaskServlet.class
