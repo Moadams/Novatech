@@ -13,6 +13,34 @@ import com.novatech.util.LoggerUtil;
 
 public class TaskDAO {
     LoggerUtil logger = new LoggerUtil();
+
+    public Task getTaskById(int id) {
+        String query = "SELECT * FROM tasks WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+    
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+    
+            if (rs.next()) {
+                Task task = new Task();
+                task.setTaskId(rs.getInt("id"));
+                task.setTitle(rs.getString("title"));
+                task.setDescription(rs.getString("description"));
+                task.setPriority(rs.getString("priority"));
+                task.setStatus(rs.getString("status"));
+                task.setCreatedAt(rs.getTimestamp("created_at"));
+                task.setUpdatedAt(rs.getTimestamp("updated_at"));
+                return task;
+            }
+    
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+
     public List<Task> getTasksByUserId(int userId) {
         String sql = "SELECT * FROM tasks WHERE user_id = ? ORDER BY due_date ASC";
         try (Connection connection = DatabaseConfig.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -40,6 +68,7 @@ public class TaskDAO {
         task.setTitle(rs.getString("title"));
         task.setDescription(rs.getString("description"));
         task.setStatus(rs.getString("status"));
+        task.setPriority(rs.getString("priority"));
         task.setDueDate(rs.getDate("due_date"));
         task.setCreatedAt(rs.getTimestamp("created_at"));
         task.setUpdatedAt(rs.getTimestamp("updated_at"));
@@ -79,6 +108,26 @@ public class TaskDAO {
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error deleting task: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean updateTask(Task task) {
+        String query = "UPDATE tasks SET title = ?, description = ?, status = ?, priority = ?, updated_at = ? WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+    
+            stmt.setString(1, task.getTitle());
+            stmt.setString(2, task.getDescription());
+            stmt.setString(3, task.getStatus());
+            stmt.setString(4, task.getPriority());
+            stmt.setTimestamp(5, task.getUpdatedAt());
+            stmt.setInt(6, task.getTaskId());
+    
+            return stmt.executeUpdate() > 0;
+    
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
