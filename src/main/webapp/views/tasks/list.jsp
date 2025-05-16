@@ -144,7 +144,7 @@
         <!-- Initial Empty State (only shown when there are truly no tasks) -->
         <% if (!hasTasks) { %>
         <div id="empty-state" class="bg-white rounded-lg shadow p-6 text-center">
-            <img src="/api/placeholder/200/150" alt="No tasks" class="mx-auto mb-4">
+            
             <h2 class="text-xl font-medium text-gray-900 mb-2">No tasks yet</h2>
             <p class="text-gray-500 mb-6">Create your first task to start being productive</p>
             <a href="create-task" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -212,7 +212,7 @@
 
         <!-- Filtered Empty State (shown when filter has no results) -->
         <div id="filtered-empty-state" class="hidden bg-white rounded-lg shadow p-6 text-center">
-            <img src="/api/placeholder/200/150" alt="No matching tasks" class="mx-auto mb-4">
+            
             <h2 class="text-xl font-medium text-gray-900 mb-2">No matching tasks</h2>
             <p class="text-gray-500 mb-6">There are no tasks matching the current filter</p>
             <a href="create-task" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
