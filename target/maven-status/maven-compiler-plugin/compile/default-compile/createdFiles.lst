@@ -1,4 +1,3 @@
-com\novatech\model\Category.class
 com\novatech\dao\TaskDAO.class
 com\novatech\util\LoggerUtil.class
 com\novatech\controller\auth\LogoutServlet.class
