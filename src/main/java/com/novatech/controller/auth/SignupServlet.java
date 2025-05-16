@@ -82,7 +82,6 @@ public class SignupServlet extends HttpServlet {
             return Math.abs(lastNumber + 1);
         }
     } catch (SQLException e) {
-        e.printStackTrace();
         System.err.println("Error generating user number: " + e.getMessage());
     }
 
