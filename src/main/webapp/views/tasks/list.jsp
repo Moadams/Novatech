@@ -1,4 +1,3 @@
-
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Date" %>
@@ -31,6 +30,30 @@
         } else {
             long years = timeDiff / 31536000;
             return years + " year" + (years == 1 ? "" : "s") + " ago";
+        }
+    }
+    
+    // Method to format due date
+    public String formatDueDate(Date dueDate) {
+        if (dueDate == null) return "No due date";
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
+        return sdf.format(dueDate);
+    }
+    
+    // Method to get days remaining until due date
+    public String getDaysRemaining(Date dueDate) {
+        if (dueDate == null) return "";
+        
+        long diffInMillies = dueDate.getTime() - new Date().getTime();
+        long diffInDays = diffInMillies / (24 * 60 * 60 * 1000);
+        
+        if (diffInDays < 0) {
+            return Math.abs(diffInDays) + " day" + (Math.abs(diffInDays) == 1 ? "" : "s") + " overdue";
+        } else if (diffInDays == 0) {
+            return "Due today";
+        } else {
+            return diffInDays + " day" + (diffInDays == 1 ? "" : "s") + " left";
         }
     }
 %>
@@ -69,8 +92,21 @@
         .status-pending { background-color: #FEF3C7; color: #92400E; }
         .status-in-progress { background-color: #DBEAFE; color: #1E40AF; }
         .status-completed { background-color: #D1FAE5; color: #065F46; }
+        .priority-low { background-color: #E0F2FE; color: #0369A1; }
+        .priority-medium { background-color: #FEF9C3; color: #854D0E; }
+        .priority-high { background-color: #FEE2E2; color: #B91C1C; }
+        .priority-critical { background-color: #FFCDD2; color: #7F1D1D; }
         .hidden {
             display: none;
+        }
+        .due-date-overdue {
+            color: #DC2626;
+        }
+        .due-date-today {
+            color: #D97706;
+        }
+        .due-date-upcoming {
+            color: #2563EB;
         }
     </style>
 </head>
@@ -123,19 +159,35 @@
         <!-- Task Filters -->
         <div class="bg-white rounded-lg shadow mb-6">
             <div class="px-4 py-5 sm:p-6">
-                <div class="flex flex-wrap gap-4" id="status-filters">
-                    <button class="filter-btn active inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full bg-indigo-100 text-indigo-800" data-status="ALL">
-                        All Tasks
-                    </button>
-                    <button class="filter-btn inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50" data-status="IN_PROGRESS">
-                        In Progress
-                    </button>
-                    <button class="filter-btn inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50" data-status="COMPLETED">
-                        Completed
-                    </button>
-                    <button class="filter-btn inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50" data-status="PENDING">
-                        Pending
-                    </button>
+                <div class="flex flex-wrap gap-4">
+                    <div id="status-filters" class="flex flex-wrap gap-2">
+                        <button class="filter-btn active inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full bg-indigo-100 text-indigo-800" data-filter="status" data-value="ALL">
+                            All Tasks
+                        </button>
+                        <button class="filter-btn inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50" data-filter="status" data-value="IN_PROGRESS">
+                            In Progress
+                        </button>
+                        <button class="filter-btn inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50" data-filter="status" data-value="COMPLETED">
+                            Completed
+                        </button>
+                        <button class="filter-btn inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50" data-filter="status" data-value="PENDING">
+                            Pending
+                        </button>
+                    </div>
+
+                    <div class="border-l border-gray-200 h-8 mx-2"></div>
+
+                    <div id="priority-filters" class="flex flex-wrap gap-2">
+                        <button class="filter-btn inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50" data-filter="priority" data-value="HIGH">
+                            High Priority
+                        </button>
+                        <button class="filter-btn inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50" data-filter="priority" data-value="MEDIUM">
+                            Medium Priority
+                        </button>
+                        <button class="filter-btn inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50" data-filter="priority" data-value="LOW">
+                            Low Priority
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -156,12 +208,14 @@
         <!-- Task Cards -->
         <div id="task-grid" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <% for (Task task : tasks) { %>
-                <div class="task-card bg-white overflow-hidden shadow rounded-lg" data-status="<%= task.getStatus() %>">
+                <div class="task-card bg-white overflow-hidden shadow rounded-lg" 
+                     data-status="<%= task.getStatus() %>"
+                     data-priority="<%= task.getPriority() %>">
                     <div class="px-4 py-5 sm:p-6">
                         <div class="flex justify-between items-start">
                             <h3 class="text-lg font-medium text-gray-900 mb-2"><%= task.getTitle() %></h3>
                             <div class="flex space-x-2">
-                                <a href="edit-task.jsp?id=<%= task.getTaskId() %>" class="text-gray-400 hover:text-gray-500">
+                                <a href="update-task?id=<%= task.getTaskId() %>" class="text-gray-400 hover:text-gray-500">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                         <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                                     </svg>
@@ -173,12 +227,53 @@
                                 </a>
                             </div>
                         </div>
+                        
                         <p class="mt-1 text-sm text-gray-600 line-clamp-3"><%= task.getDescription() %></p>
-                        <div class="mt-4 flex justify-between items-center">
+                        
+                        <div class="mt-4 flex flex-wrap gap-2">
                             <span class="status-badge <%= task.getStatus().equals("COMPLETED") ? "status-completed" : task.getStatus().equals("IN_PROGRESS") ? "status-in-progress" : "status-pending" %>">
                                 <%= task.getStatus() %>
                             </span>
-                            <span class="text-xs text-gray-500"><%= getTimeAgo(task.getCreatedAt()) %></span>
+                            
+                            <span class="status-badge <%= 
+                                task.getPriority().equals("HIGH") ? "priority-high" : 
+                                task.getPriority().equals("MEDIUM") ? "priority-medium" : 
+                                task.getPriority().equals("CRITICAL") ? "priority-critical" : 
+                                "priority-low" %>">
+                                <%= task.getPriority() %> Priority
+                            </span>
+                        </div>
+                        
+                        <div class="mt-3 border-t border-gray-100 pt-3">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <% if (task.getDueDate() != null) { 
+                                        long diffInMillies = task.getDueDate().getTime() - new Date().getTime();
+                                        long diffInDays = diffInMillies / (24 * 60 * 60 * 1000);
+                                        String dueDateClass = diffInDays < 0 ? "due-date-overdue" : 
+                                                             diffInDays == 0 ? "due-date-today" : 
+                                                             "due-date-upcoming";
+                                    %>
+                                        <div class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            <span class="text-xs <%= dueDateClass %>">
+                                                <%= formatDueDate(task.getDueDate()) %> 
+                                                (<%= getDaysRemaining(task.getDueDate()) %>)
+                                            </span>
+                                        </div>
+                                    <% } else { %>
+                                        <div class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            <span class="text-xs text-gray-500">No due date</span>
+                                        </div>
+                                    <% } %>
+                                </div>
+                                <span class="text-xs text-gray-500"><%= getTimeAgo(task.getCreatedAt()) %></span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -204,12 +299,25 @@
             const taskGrid = document.getElementById('task-grid');
             const filteredEmptyState = document.getElementById('filtered-empty-state');
             
-            // Function to apply filter
-            function applyFilter(status) {
+            // Current active filters
+            let activeFilters = {
+                status: 'ALL',
+                priority: null
+            };
+            
+            // Function to apply filters
+            function applyFilters() {
                 let visibleCount = 0;
                 
                 taskCards.forEach(card => {
-                    if (status === 'ALL' || card.dataset.status === status) {
+                    const cardStatus = card.dataset.status;
+                    const cardPriority = card.dataset.priority;
+                    
+                    // Check if card matches all active filters
+                    const matchesStatus = activeFilters.status === 'ALL' || cardStatus === activeFilters.status;
+                    const matchesPriority = !activeFilters.priority || cardPriority === activeFilters.priority;
+                    
+                    if (matchesStatus && matchesPriority) {
                         card.classList.remove('hidden');
                         visibleCount++;
                     } else {
@@ -225,10 +333,15 @@
                     taskGrid.classList.remove('hidden');
                     filteredEmptyState.classList.add('hidden');
                 }
-                
-                // Update active filter button styles
+            }
+            
+            // Update filter button styles
+            function updateFilterButtonStyles() {
                 filterButtons.forEach(btn => {
-                    if (btn.dataset.status === status) {
+                    const filterType = btn.dataset.filter;
+                    const filterValue = btn.dataset.value;
+                    
+                    if (activeFilters[filterType] === filterValue) {
                         btn.classList.add('bg-indigo-100', 'text-indigo-800');
                         btn.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
                     } else {
@@ -241,13 +354,24 @@
             // Add click event listeners to filter buttons
             filterButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    const status = this.dataset.status;
-                    applyFilter(status);
+                    const filterType = this.dataset.filter;
+                    const filterValue = this.dataset.value;
+                    
+                    // Toggle priority filters (can be turned off)
+                    if (filterType === 'priority' && activeFilters.priority === filterValue) {
+                        activeFilters.priority = null;
+                    } else {
+                        activeFilters[filterType] = filterValue;
+                    }
+                    
+                    updateFilterButtonStyles();
+                    applyFilters();
                 });
             });
             
             // Initialize with "All Tasks" filter
-            applyFilter('ALL');
+            updateFilterButtonStyles();
+            applyFilters();
         });
     </script>
 </body>
